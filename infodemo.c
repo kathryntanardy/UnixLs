@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <grp.h>
+#include <pwd.h>
 
 void getAndPrintGroup(gid_t grpNum) {
   struct group *grp;
@@ -33,7 +35,7 @@ void getAndPrintUserName(uid_t uid) {
 
 int main() {
 
-  struct group *grp;
+
 
   getAndPrintGroup(1001);
   getAndPrintGroup(514378);
