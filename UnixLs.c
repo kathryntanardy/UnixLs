@@ -37,13 +37,11 @@ int main(){
     int command;
     int inode;
     int longlist; 
-    int invalid;
     while(1){
         //Identify the commands by using strtok
         command = 0;
         inode = 0;
         longlist = 0;
-        invalid = 0;
         filepath[0] = '\0';
         message[0] = '\0';
         fgets(message, MSG_MAX_LENGTH, stdin);
@@ -76,8 +74,6 @@ int main(){
                         longlist = 1;
                     else if (tokens[i][j] == 'i')
                         inode = 1;
-                    else
-                        invalid = 1;
                     }
             }else{
                 strcpy(filepath, tokens[i]);
@@ -89,7 +85,6 @@ int main(){
         printf("inode: %d\n", inode);
         printf("longlist: %d\n", longlist);
         printf("filepath: %s\n", filepath);
-        printf("invalid: %d\n", invalid);
 
         // if(strcmp(message, "UnixLs ") || strcmp(message, "UnixLs")){
         //     ls(".");
