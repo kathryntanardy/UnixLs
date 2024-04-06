@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <string.h>
 #include <dirent.h>
 #include <grp.h>
@@ -9,7 +10,37 @@
 
 #define MSG_MAX_LENGTH 300
 
-void ls(const char* filepath){
+void getAndPrintUserName(uid_t uid) {
+
+  struct passwd *pw = NULL;
+  pw = getpwuid(uid);
+
+  if (pw) {
+    printf("%s ", pw->pw_name);
+  } else {
+    perror("Hmm not found???");
+    printf("No name found for %u\n", uid);
+  }
+}
+
+void getAndPrintGroup(gid_t grpNum) {
+  struct group *grp;
+
+  grp = getgrgid(grpNum); 
+  
+  if (grp) {
+    printf("%s ", grp->gr_name);
+  } else {
+    printf("No group name for %u found\n", grpNum);
+  }
+}
+
+void printOutput(const char* filepath, const int* inode, const int* longlist, const int* command){
+    if(*command == 1){
+        printf("Command not recognized\n");
+        return;
+    }
+   
     DIR* dir = opendir(filepath);
     if (dir == NULL){
         printf("opendir() not successful.\n");
@@ -17,13 +48,85 @@ void ls(const char* filepath){
     }
 
     struct dirent* entry;
+    struct stat st;
     entry = readdir(dir);
     while(entry != NULL){
-        if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 ){
+        if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 || entry->d_name[0] == '.'){
             entry = readdir(dir);
             continue;
         }
-        printf("%s  ",entry->d_name);
+
+        if(stat(entry->d_name, &st) == 0){
+            if(*inode == 1)
+                printf("%lu ", st.st_ino);
+            
+            if(*longlist == 1){
+                if(S_ISDIR(st.st_mode))
+                    printf("d");
+                else
+                    printf("-");
+                
+                if(st.st_mode & S_IRUSR)
+                    printf("r");
+                else
+                    printf("-");
+
+                if(st.st_mode & S_IWUSR)
+                    printf("w");
+                else
+                    printf("-");
+
+                if(st.st_mode & S_IXUSR)
+                    printf("x");
+                else
+                    printf("-");
+
+                if(st.st_mode & S_IRGRP)
+                    printf("r");
+                else
+                    printf("-");  
+
+                if(st.st_mode & S_IWGRP)
+                    printf("w");
+                else
+                    printf("-");  
+                
+                if(st.st_mode & S_IXGRP)
+                    printf("x");
+                else
+                    printf("-");  
+
+                if(st.st_mode & S_IROTH)
+                    printf("r");
+                else
+                    printf("-"); 
+
+                if(st.st_mode & S_IWOTH)
+                    printf("w");
+                else
+                    printf("-"); 
+
+                if(st.st_mode & S_IXOTH)
+                    printf("x");
+                else
+                    printf("-"); 
+
+                printf(" %lu ",st.st_nlink);
+
+                getAndPrintUserName(st.st_uid);
+                getAndPrintGroup(st.st_gid);
+
+                printf("%5lu ", st.st_size);
+            }
+
+            
+            printf("%s  ",entry->d_name);
+
+            if(*longlist ==1){
+                printf("\n");
+            }
+           
+        }
         entry = readdir(dir);
     }
     printf("\n");
@@ -61,11 +164,16 @@ int main(int argc, char *argv[]){
         }
     }  
 
+    //If filepath 
+    if(filepath[0] == '\0'){
+        filepath[0] = '.';
+        filepath[1] = '\0';
+    }
 
-
-    // printf("command: %d\n", command);
-    // printf("inode: %d\n", inode);
-    // printf("longlist: %d\n", longlist);
-    // printf("filepath: %s\n", filepath);
+    printOutput(filepath, &inode, &longlist, &command);
+    printf("command: %d\n", command);
+    printf("inode: %d\n", inode);
+    printf("longlist: %d\n", longlist);
+    printf("filepath: %s\n", filepath);
     return 0;
 }
