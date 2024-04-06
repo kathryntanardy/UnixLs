@@ -121,15 +121,12 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
                 struct tm time_s;
                 localtime_r(&time, &time_s);
                 strftime(timeString, sizeof(timeString), "%b %-d %Y %H:%M", &time_s);
-
                 printf("%s ", timeString); 
-                
             }
-
             
             printf("%s  ",entry->d_name);
 
-            if(*longlist ==1){
+            if(*longlist == 1){
                 printf("\n");
             }
            
