@@ -51,3 +51,26 @@ int main() {
 	return 0;
 
 }
+ 
+    // if(argc < 0){
+    //     printf("Error, no command specified\n");
+    // }
+    
+
+    //     char * token = strtok(message, " ");
+    //     char * tokens[MSG_MAX_LENGTH];
+    //     int count = 0;
+
+    //     while(token != NULL){
+    //         tokens[count++] = token;
+    //         token = strtok(NULL, " ");
+    //     }
+    
+    //     if(count <= 0){
+    //         printf("No command specified.\n");
+    //         return 0;
+    //     }
+
+    //     if(strcmp(tokens[0], "UnixLs") == 0){
+    //         command = 1;
+    //     }

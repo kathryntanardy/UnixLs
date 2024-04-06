@@ -30,65 +30,42 @@ void ls(const char* filepath){
     closedir(dir);
 }
 
-int main(){
+int main(int argc, char *argv[]){
 
-    char message[MSG_MAX_LENGTH];
+
+    // char message[MSG_MAX_LENGTH];
     char filepath[MSG_MAX_LENGTH];
-    int command;
-    int inode;
-    int longlist; 
-    while(1){
-        //Identify the commands by using strtok
-        command = 0;
-        inode = 0;
-        longlist = 0;
-        filepath[0] = '\0';
-        message[0] = '\0';
-        fgets(message, MSG_MAX_LENGTH, stdin);
-        
-        size_t length = strlen(message);
-        message[length-1] = '\0';
-    
-        char * token = strtok(message, " ");
-        char * tokens[MSG_MAX_LENGTH];
-        int count = 0;
+    int command = 0;
+    int inode = 0;
+    int longlist = 0;
+ 
+    filepath[0] = '\0';
 
-        while(token != NULL){
-            tokens[count++] = token;
-            token = strtok(NULL, " ");
-        }
-    
-        if(count <= 0){
-            printf("No command specified.\n");
-            continue;
-        }
-
-        if(strcmp(tokens[0], "UnixLs") == 0){
-            command = 1;
-        }
-
-        for(int i = 1; i < count; i++){
-            if(tokens[i][0] == '-'){
-                for(int j = 1; tokens[i][j] != '\0'; j++){
-                    if(tokens[i][j] == 'l')
-                        longlist = 1;
-                    else if (tokens[i][j] == 'i')
-                        inode = 1;
-                    }
-            }else{
-                strcpy(filepath, tokens[i]);
-                break;
-            }
-        }  
-
-        printf("command: %d\n", command);
-        printf("inode: %d\n", inode);
-        printf("longlist: %d\n", longlist);
-        printf("filepath: %s\n", filepath);
-
-        // if(strcmp(message, "UnixLs ") || strcmp(message, "UnixLs")){
-        //     ls(".");
-        // }
+    if(strcmp(argv[0], "UnixLs") == 0){
+        command = 1;
     }
+   
+    for(int i = 1; i < argc; i++){
+        if(argv[i][0] == '-'){
+            for(int j = 1; argv[i][j] != '\0'; j++){
+                if(argv[i][j] == 'l')
+                    longlist = 1;
+                else if (argv[i][j] == 'i')
+                    inode = 1;
+                else
+                    strcpy(filepath, argv[i]);
+            }       
+        }else{
+            strcpy(filepath, argv[i]);
+            break;
+        }
+    }  
+
+
+
+    // printf("command: %d\n", command);
+    // printf("inode: %d\n", inode);
+    // printf("longlist: %d\n", longlist);
+    // printf("filepath: %s\n", filepath);
     return 0;
 }
