@@ -6,7 +6,7 @@
 #include <dirent.h>
 #include <grp.h>
 #include <pwd.h>
-
+#include <time.h>
 
 #define MSG_MAX_LENGTH 300
 
@@ -112,11 +112,18 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
                     printf("-"); 
 
                 printf(" %lu ",st.st_nlink);
-
                 getAndPrintUserName(st.st_uid);
                 getAndPrintGroup(st.st_gid);
-
                 printf("%5lu ", st.st_size);
+                
+                char timeString[MSG_MAX_LENGTH];
+                time_t time = st.st_mtime;
+                struct tm time_s;
+                localtime_r(&time, &time_s);
+                strftime(timeString, sizeof(timeString), "%b %-d %Y %H:%M", &time_s);
+
+                printf("%s ", timeString); 
+                
             }
 
             
@@ -171,9 +178,9 @@ int main(int argc, char *argv[]){
     }
 
     printOutput(filepath, &inode, &longlist, &command);
-    printf("command: %d\n", command);
-    printf("inode: %d\n", inode);
-    printf("longlist: %d\n", longlist);
-    printf("filepath: %s\n", filepath);
+    // printf("command: %d\n", command);
+    // printf("inode: %d\n", inode);
+    // printf("longlist: %d\n", longlist);
+    // printf("filepath: %s\n", filepath);
     return 0;
 }
