@@ -7,6 +7,7 @@
 #include <grp.h>
 #include <pwd.h>
 #include <time.h>
+#include <errno.h>
 
 #define MSG_MAX_LENGTH 300
 
@@ -43,7 +44,7 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
    
     DIR* dir = opendir(filepath);
     if (dir == NULL){
-        printf("opendir() not successful.\n");
+        printf("Invaild directory: %s\n", filepath);
         return;
     }
 
@@ -55,7 +56,6 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
             entry = readdir(dir);
             continue;
         }
-
         if(stat(entry->d_name, &st) == 0){
             if(*inode == 1)
                 printf("%lu ", st.st_ino);
@@ -131,6 +131,7 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
             }
            
         }
+        
         entry = readdir(dir);
     }
     printf("\n");
@@ -159,22 +160,22 @@ int main(int argc, char *argv[]){
                     longlist = 1;
                 else if (argv[i][j] == 'i')
                     inode = 1;
-                else
-                    strcpy(filepath, argv[i]);
             }       
-        }else{
+        }
+        else{
             strcpy(filepath, argv[i]);
-            break;
+            if(filepath[0] == '\0')
+            {
+            filepath[0] = '.';
+            filepath[1] = '\0';
+            }
+            printf ("%s:\n", filepath);
+            printOutput(filepath, &inode, &longlist, &command);
         }
     }  
 
     //If filepath 
-    if(filepath[0] == '\0'){
-        filepath[0] = '.';
-        filepath[1] = '\0';
-    }
 
-    printOutput(filepath, &inode, &longlist, &command);
     // printf("command: %d\n", command);
     // printf("inode: %d\n", inode);
     // printf("longlist: %d\n", longlist);
