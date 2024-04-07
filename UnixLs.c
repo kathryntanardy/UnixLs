@@ -41,7 +41,7 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
         printf("Command not recognized\n");
         return;
     }
-   
+
     DIR* dir = opendir(filepath);
     if (dir == NULL){
         printf("Invaild directory: %s\n", filepath);
@@ -50,13 +50,16 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
 
     struct dirent* entry;
     struct stat st;
+
     entry = readdir(dir);
     while(entry != NULL){
         if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 || entry->d_name[0] == '.'){
             entry = readdir(dir);
             continue;
         }
-        if(stat(entry->d_name, &st) == 0){
+        char newpath[MSG_MAX_LENGTH];
+        sprintf(newpath, "%s/%s", filepath, entry->d_name);
+        if(stat(newpath, &st) == 0){
             if(*inode == 1)
                 printf("%lu ", st.st_ino);
             
