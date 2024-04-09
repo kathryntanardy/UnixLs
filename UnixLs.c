@@ -8,6 +8,7 @@
 #include <pwd.h>
 #include <time.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #define MSG_MAX_LENGTH 300
 
@@ -129,7 +130,9 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
                 printf("%s ", timeString); 
             }
             
+            //For formatting purposes only
             printf("%s ",entry->d_name);
+           
 
             if(*longlist == 1 && S_ISLNK(st.st_mode)){
                 char realFile[MSG_MAX_LENGTH];
@@ -141,7 +144,8 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
             }else{
                 printf(" ");
             }
-            if(*longlist == 1){
+
+            if(*longlist == 1 || *inode == 1){
                 printf("\n");
             }
            
@@ -184,7 +188,7 @@ int main(int argc, char *argv[]){
             if ((i+1) == argc){
                 filepath[0] = '.';
                 filepath[1] = '\0';
-            }     
+            }    
         }
         else{
             strcpy(filepath, argv[i]);
