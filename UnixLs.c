@@ -59,13 +59,15 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
         }
         char newpath[MSG_MAX_LENGTH];
         sprintf(newpath, "%s/%s", filepath, entry->d_name);
-        if(stat(newpath, &st) == 0){
+        if(lstat(newpath, &st) == 0){
             if(*inode == 1)
                 printf("%lu ", st.st_ino);
             
             if(*longlist == 1){
-                if(S_ISDIR(st.st_mode))
+                if(S_ISDIR(sst.st_mode))
                     printf("d");
+                else if(S_ISLNK(st.st_mode))
+                    printf("l");
                 else
                     printf("-");
                 
@@ -186,9 +188,9 @@ int main(int argc, char *argv[]){
 
     //If filepath 
 
-    // printf("command: %d\n", command);
-    // printf("inode: %d\n", inode);
-    // printf("longlist: %d\n", longlist);
-    // printf("filepath: %s\n", filepath);
+    printf("command: %d\n", command);
+    printf("inode: %d\n", inode);
+    printf("longlist: %d\n", longlist);
+    printf("filepath: %s\n", filepath);
     return 0;
 }
