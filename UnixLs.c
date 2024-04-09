@@ -171,7 +171,11 @@ int main(int argc, char *argv[]){
                     longlist = 1;
                 else if (argv[i][j] == 'i')
                     inode = 1;
-            }       
+            }  
+            if ((i+1) == argc){
+                filepath[0] = '.';
+                filepath[1] = '\0';
+            }     
         }
         else{
             strcpy(filepath, argv[i]);
