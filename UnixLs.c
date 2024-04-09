@@ -64,7 +64,7 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
                 printf("%lu ", st.st_ino);
             
             if(*longlist == 1){
-                if(S_ISDIR(sst.st_mode))
+                if(S_ISDIR(st.st_mode))
                     printf("d");
                 else if(S_ISLNK(st.st_mode))
                     printf("l");
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]){
         printOutput(filepath, &inode, &longlist, &command);
         return 0;
     }
-   
+    int flag = 0;   
     for(int i = 1; i < argc; i++){  
         if(argv[i][0] == '-'){
             for(int j = 1; argv[i][j] != '\0'; j++){
@@ -175,22 +175,30 @@ int main(int argc, char *argv[]){
         }
         else{
             strcpy(filepath, argv[i]);
+        
             if(filepath[0] == '\0')
             {
             filepath[0] = '.';
             filepath[1] = '\0';
             }
-            if (argc > 2)
+        }
+        
+            
+        if (filepath[0] != '\0'){
+            if ((argc - i) > 1 || flag == 1){
                 printf ("%s:\n", filepath);
+                flag = 1;
+            }
             printOutput(filepath, &inode, &longlist, &command);
         }
+        
     }  
 
     //If filepath 
 
-    printf("command: %d\n", command);
-    printf("inode: %d\n", inode);
-    printf("longlist: %d\n", longlist);
-    printf("filepath: %s\n", filepath);
+    // printf("command: %d\n", command);
+    // printf("inode: %d\n", inode);
+    // printf("longlist: %d\n", longlist);
+    // printf("filepath: %s\n", filepath);
     return 0;
 }
