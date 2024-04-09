@@ -155,8 +155,14 @@ int main(int argc, char *argv[]){
     if(strcmp(argv[0], "UnixLs") == 0){
         command = 1;
     }
+
+    if (argc == 1){
+        strcpy(filepath, ".");
+        printOutput(filepath, &inode, &longlist, &command);
+        return 0;
+    }
    
-    for(int i = 1; i < argc; i++){
+    for(int i = 1; i < argc; i++){  
         if(argv[i][0] == '-'){
             for(int j = 1; argv[i][j] != '\0'; j++){
                 if(argv[i][j] == 'l')
@@ -172,7 +178,8 @@ int main(int argc, char *argv[]){
             filepath[0] = '.';
             filepath[1] = '\0';
             }
-            printf ("%s:\n", filepath);
+            if (argc > 2)
+                printf ("%s:\n", filepath);
             printOutput(filepath, &inode, &longlist, &command);
         }
     }  

@@ -5,4 +5,4 @@ test:
 	gcc -Wall -Werror infodemo.c -o test
 
 clean: 
-	rm output
+	rm UnixLs test
