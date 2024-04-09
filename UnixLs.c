@@ -40,29 +40,33 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
         printf("Command not recognized\n");
         return;
     }
-   
+
     DIR* dir = opendir(filepath);
     if (dir == NULL){
-        printf("opendir() not successful.\n");
+        printf("Invaild directory: %s\n", filepath);
         return;
     }
 
     struct dirent* entry;
     struct stat st;
+
     entry = readdir(dir);
     while(entry != NULL){
         if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 || entry->d_name[0] == '.'){
             entry = readdir(dir);
             continue;
         }
-
-        if(stat(entry->d_name, &st) == 0){
+        char newpath[MSG_MAX_LENGTH];
+        sprintf(newpath, "%s/%s", filepath, entry->d_name);
+        if(lstat(newpath, &st) == 0){
             if(*inode == 1)
-                printf("%lu ", st.st_ino);
+                printf("%15lu ", st.st_ino);
             
             if(*longlist == 1){
                 if(S_ISDIR(st.st_mode))
                     printf("d");
+                else if(S_ISLNK(st.st_mode))
+                    printf("l");
                 else
                     printf("-");
                 
@@ -126,11 +130,20 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
             
             printf("%s  ",entry->d_name);
 
+            if(*longlist == 1 && S_ISLNK(st.st_mode)){
+                char realFile[MSG_MAX_LENGTH];
+                ssize_t len = readlink(newpath, realFile, sizeof(realFile) -1);
+                if (len != -1){
+                    realFile[len] = '\0';
+                    printf("-> %s", realFile);
+                }
+            }
             if(*longlist == 1){
                 printf("\n");
             }
            
         }
+        
         entry = readdir(dir);
     }
     printf("\n");
