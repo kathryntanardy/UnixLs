@@ -61,7 +61,7 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
         sprintf(newpath, "%s/%s", filepath, entry->d_name);
         if(lstat(newpath, &st) == 0){
             if(*inode == 1)
-                printf("%lu ", st.st_ino);
+                printf("%10lu ", st.st_ino);
             
             if(*longlist == 1){
                 if(S_ISDIR(st.st_mode))
@@ -129,8 +129,18 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
                 printf("%s ", timeString); 
             }
             
-            printf("%s  ",entry->d_name);
+            printf("%s ",entry->d_name);
 
+            if(*longlist == 1 && S_ISLNK(st.st_mode)){
+                char realFile[MSG_MAX_LENGTH];
+                ssize_t len = readlink(newpath, realFile, sizeof(realFile) -1);
+                if (len != -1){
+                    realFile[len] = '\0';
+                    printf("-> %s", realFile);
+                }
+            }else{
+                printf(" ");
+            }
             if(*longlist == 1){
                 printf("\n");
             }
@@ -142,7 +152,6 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
     printf("\n");
     closedir(dir);
 }
-
 int main(int argc, char *argv[]){
 
 
