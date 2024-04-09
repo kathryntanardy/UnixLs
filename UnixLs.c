@@ -183,7 +183,7 @@ int main(int argc, char *argv[]){
             switchFlag = 1;
         }
         else if(argv[i][0] == '-' && switchFlag == 1){
-            printf("\nCommand %s should come before any directory names\n", argv[i]);
+            printf("Command %s should come before any directory names\n", argv[i]);
             return 0;
         }
     }
