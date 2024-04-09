@@ -7,6 +7,8 @@
 #include <grp.h>
 #include <pwd.h>
 #include <time.h>
+#include <errno.h>
+#include <stdbool.h>
 
 #define MSG_MAX_LENGTH 300
 
@@ -41,6 +43,7 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
         return;
     }
 
+
     DIR* dir = opendir(filepath);
     if (dir == NULL){
         printf("Invaild directory: %s\n", filepath);
@@ -49,6 +52,7 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
 
     struct dirent* entry;
     struct stat st;
+
 
     entry = readdir(dir);
     while(entry != NULL){
@@ -59,12 +63,17 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
         char newpath[MSG_MAX_LENGTH];
         sprintf(newpath, "%s/%s", filepath, entry->d_name);
         if(lstat(newpath, &st) == 0){
+        char newpath[MSG_MAX_LENGTH];
+        sprintf(newpath, "%s/%s", filepath, entry->d_name);
+        if(lstat(newpath, &st) == 0){
             if(*inode == 1)
-                printf("%15lu ", st.st_ino);
+                printf("%10lu ", st.st_ino);
             
             if(*longlist == 1){
                 if(S_ISDIR(st.st_mode))
                     printf("d");
+                else if(S_ISLNK(st.st_mode))
+                    printf("l");
                 else if(S_ISLNK(st.st_mode))
                     printf("l");
                 else
@@ -128,7 +137,9 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
                 printf("%s ", timeString); 
             }
             
-            printf("%s  ",entry->d_name);
+            //For formatting purposes only
+            printf("%s ",entry->d_name);
+           
 
             if(*longlist == 1 && S_ISLNK(st.st_mode)){
                 char realFile[MSG_MAX_LENGTH];
@@ -137,19 +148,22 @@ void printOutput(const char* filepath, const int* inode, const int* longlist, co
                     realFile[len] = '\0';
                     printf("-> %s", realFile);
                 }
+            }else{
+                printf(" ");
             }
-            if(*longlist == 1){
+
+            if(*longlist == 1 || *inode == 1){
                 printf("\n");
             }
            
         }
+        
         
         entry = readdir(dir);
     }
     printf("\n");
     closedir(dir);
 }
-
 int main(int argc, char *argv[]){
 
 
@@ -164,30 +178,49 @@ int main(int argc, char *argv[]){
     if(strcmp(argv[0], "UnixLs") == 0){
         command = 1;
     }
-   
-    for(int i = 1; i < argc; i++){
+
+    if (argc == 1){
+        strcpy(filepath, ".");
+        printOutput(filepath, &inode, &longlist, &command);
+        return 0;
+    }
+    int flag = 0;   
+    for(int i = 1; i < argc; i++){  
         if(argv[i][0] == '-'){
             for(int j = 1; argv[i][j] != '\0'; j++){
                 if(argv[i][j] == 'l')
                     longlist = 1;
                 else if (argv[i][j] == 'i')
                     inode = 1;
-                else
-                    strcpy(filepath, argv[i]);
-            }       
-        }else{
-            strcpy(filepath, argv[i]);
-            break;
+            }  
+            if ((i+1) == argc){
+                filepath[0] = '.';
+                filepath[1] = '\0';
+            }    
         }
+        else{
+            strcpy(filepath, argv[i]);
+        
+            if(filepath[0] == '\0')
+            {
+            filepath[0] = '.';
+            filepath[1] = '\0';
+            }
+        }
+        
+            
+        if (filepath[0] != '\0'){
+            if ((argc - i) > 1 || flag == 1){
+                printf ("%s:\n", filepath);
+                flag = 1;
+            }
+            printOutput(filepath, &inode, &longlist, &command);
+        }
+        
     }  
 
     //If filepath 
-    if(filepath[0] == '\0'){
-        filepath[0] = '.';
-        filepath[1] = '\0';
-    }
 
-    printOutput(filepath, &inode, &longlist, &command);
     // printf("command: %d\n", command);
     // printf("inode: %d\n", inode);
     // printf("longlist: %d\n", longlist);
