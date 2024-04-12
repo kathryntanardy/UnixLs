@@ -177,6 +177,16 @@ int main(int argc, char *argv[]){
         return 0;
     }
     int flag = 0;   
+    int switchFlag = 0;
+    for (int i = 1; i < argc; i++){
+        if(argv[i][0] != '-' ){
+            switchFlag = 1;
+        }
+        else if(argv[i][0] == '-' && switchFlag == 1){
+            printf("Command %s should come before any directory names\n", argv[i]);
+            return 0;
+        }
+    }
     for(int i = 1; i < argc; i++){  
         if(argv[i][0] == '-'){
             for(int j = 1; argv[i][j] != '\0'; j++){
@@ -207,6 +217,7 @@ int main(int argc, char *argv[]){
                 flag = 1;
             }
             printOutput(filepath, &inode, &longlist, &command);
+            switchFlag = 1;
         }
         
     }  
